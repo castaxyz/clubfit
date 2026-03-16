@@ -1,0 +1,46 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Entornos virtuales
+venv/
+.env/
+.envrc
+
+# Archivos de entorno
+.env
+*.env
+
+# Distribución / packaging
+build/
+dist/
+*.egg-info/
+
+# Logs
+*.log
+
+# Archivos temporales del sistema
+.DS_Store
+Thumbs.db
+
+# SQLite
+*.db
+*.sqlite3
+
+# Pytest
+.pytest_cache/
+
+# Coverage
+.coverage
+htmlcov/
+
+# IDEs / editores
+.vscode/
+.idea/
+
+# Archivos de notebook
+.ipynb_checkpoints/
+
+# Archivos de migración (si luego usan Alembic)
+migrations/versions/
