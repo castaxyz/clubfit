@@ -67,3 +67,11 @@ class MemberRepositorySQLAlchemy(MemberRepository):
             )
 
         return members
+
+    def delete(self, member_id):
+        session = SessionLocal()
+        model = session.query(MemberModel).get(member_id)
+        if model:
+            session.delete(model)
+            session.commit()
+        session.close()

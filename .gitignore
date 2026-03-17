@@ -44,3 +44,5 @@ htmlcov/
 
 # Archivos de migración (si luego usan Alembic)
 migrations/versions/
+
+docs/

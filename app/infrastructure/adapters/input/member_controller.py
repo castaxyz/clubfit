@@ -47,6 +47,23 @@ def create_routes(use_cases):
 
         return jsonify(result)
 
+    @member_bp.route("/members/<int:member_id>", methods=["GET"])
+    def get_member(member_id):
+        member = use_cases.get_member(member_id)
+        if not member:
+            return jsonify({"error": "Member not found"}), 404
+        
+        return jsonify({
+            "id": member.id,
+            "name": member.name,
+            "join_date": str(member.join_date),
+            "expiration_date": str(member.expiration_date)
+        })
+
+    @member_bp.route("/members/<int:member_id>", methods=["DELETE"])
+    def delete_member(member_id):
+        use_cases.delete_member(member_id)
+        return jsonify({"message": "Member deleted"})
 
     @member_bp.route("/members/<int:member_id>/renew", methods=["POST"])
     def renew(member_id):

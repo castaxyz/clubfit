@@ -14,3 +14,7 @@ class MemberRepository(ABC):
     @abstractmethod
     def list_all(self):
         pass
+
+    @abstractmethod
+    def delete(self, member_id):
+        pass
