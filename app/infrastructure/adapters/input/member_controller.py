@@ -1,7 +1,4 @@
 from flask import Blueprint, request, jsonify
-from datetime import datetime
-
-from app.domain.entities.member import Member
 
 member_bp = Blueprint("members", __name__)
 
@@ -17,14 +14,10 @@ def create_routes(use_cases):
 
         data = request.json
 
-        member = Member(
+        use_cases.create_member(
             id=data["id"],
-            name=data["name"],
-            join_date=datetime.now(),
-            expiration_date=datetime.now(),
+            name=data["name"]
         )
-
-        use_cases.create_member(member)
 
         return jsonify({"message": "Member created"})
 
@@ -64,6 +57,12 @@ def create_routes(use_cases):
     def delete_member(member_id):
         use_cases.delete_member(member_id)
         return jsonify({"message": "Member deleted"})
+
+    @member_bp.route("/members/<int:member_id>", methods=["PUT"])
+    def update_member(member_id):
+        data = request.json
+        member = use_cases.update_member(member_id, data["name"])
+        return jsonify({"message": "Member updated", "name": member.name})
 
     @member_bp.route("/members/<int:member_id>/renew", methods=["POST"])
     def renew(member_id):

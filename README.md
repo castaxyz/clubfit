@@ -5,64 +5,68 @@ Este proyecto es una implementación académica de un sistema de gestión de mie
 ## Requisitos del Taller
 - **Funcionalidad Total (CRUD):** Gestión completa de miembros (Crear, Listar, Obtener, Actualizar/Renovar, Eliminar).
 - **Regla de Negocio:** Beneficio de `MES_BONIFICADO` si el miembro tiene más de 12 meses de antigüedad al renovar.
-- **Arquitectura Hexagonal:** Separación estricta entre Dominio, Aplicación e Infraestructura.
+- **Arquitectura Hexagonal:** Aplicación de separación estricta entre Dominio, Aplicación e Infraestructura.
 
 ## Estructura de Capas (Mapping)
-La arquitectura hexagonal se mapea de la siguiente manera en el proyecto:
+La arquitectura hexagonal se mapea de la siguiente manera:
 
 1.  **DOMINIO (Núcleo):**
-    - `app/domain/entities/`: Definición de entidades de negocio (`Member`) y reglas de renovación.
-    - `app/domain/ports/`: Interfaces (Puertos de Salida) que definen cómo se comunica el dominio con el exterior (`MemberRepository`).
+    - `app/domain/entities/`: Entidades de negocio (`Member`) y sus reglas.
+    - `app/domain/ports/`: Interfaces (Puertos) que definen el contrato de persistencia.
 2.  **APLICACIÓN (Casos de Uso):**
-    - `app/application/use_cases/`: Orquestación de la lógica de negocio (`MemberUseCases`). Aquí se coordina el uso de puertos y entidades.
+    - `app/application/use_cases/`: Casos de uso que orquestan el negocio (Crear, Listar, Actualizar, Eliminar, Renovar).
 3.  **INFRAESTRUCTURA (Adaptadores):**
-    - **Entrada (Input):** `app/infrastructure/adapters/input/` (Controladores Flask que exponen la API).
-    - **Salida (Output):** `app/infrastructure/adapters/output/` (Implementación de persistencia con SQLAlchemy).
-    - **Persistencia:** `app/infrastructure/persistence/` (Modelos de base de datos y configuración).
+    - **Entrada (Input):** Flask (Adaptador para recibir peticiones HTTP).
+    - **Salida (Output):** SQLAlchemy (Adaptador para persistencia en base de datos).
 
 ## Patrones de Diseño Aplicados
-- **Repository Pattern:** Desacopla la lógica de negocio de la implementación específica de la base de datos (SQLAlchemy).
-- **Dependency Injection:** Los casos de uso reciben sus dependencias (repositorio) a través del constructor, facilitando el testing y la inversión de dependencias.
-- **Adapter Pattern:** Los controladores (Flask) y los repositorios (SQLAlchemy) actúan como adaptadores que conectan el mundo exterior con el corazón de la aplicación.
+- **Repository Pattern:** Desacopla la lógica de negocio del acceso a datos.
+- **Dependency Injection:** Inyección de dependencias en los casos de uso para invertir el control.
+- **Adapter Pattern:** Flask y SQLAlchemy conectan el núcleo con tecnologías externas.
 
 ## Instalación y Ejecución
 1. Clonar el repositorio.
 2. Crear entorno virtual: `python -m venv venv`.
-3. Activar entorno: `source venv/bin/activate` (Linux).
+3. Activar entorno: `source venv/bin/activate`.
 4. Instalar dependencias: `pip install -r requirements.txt`.
 5. Ejecutar: `python run.py`.
 
-## Documentación de la API (Endpoints & cURL)
+## Documentación de la API (CRUD Completo)
 
-### 1. Crear Miembro
-**POST** `/members`
+Comandos `cURL` verificados para probar toda la funcionalidad:
+
+### 1. Crear un Miembro (Create)
 ```bash
 curl -X POST http://127.0.0.1:5000/members \
      -H "Content-Type: application/json" \
-     -d '{"id": 1, "name": "Carlos Gomez"}'
+     -d '{"id": 2, "name": "Ana Perez"}'
 ```
 
-### 2. Listar Miembros
-**GET** `/members`
+### 2. Listar todos los Miembros (Read All)
 ```bash
-curl -G http://127.0.0.1:5000/members
+curl -X GET http://127.0.0.1:5000/members
 ```
 
-### 3. Obtener Miembro por ID
-**GET** `/members/<id>`
+### 3. Obtener un Miembro por ID (Read One)
 ```bash
-curl -G http://127.0.0.1:5000/members/1
+curl -X GET http://127.0.0.1:5000/members/2
 ```
 
-### 4. Renovar Membresía (Regla de Negocio)
-**POST** `/members/<id>/renew`
-*Aplica +30 días base, o +60 días si el miembro tiene >12 meses de antigüedad.*
+### 4. Actualizar un Miembro (Update)
+Actualiza el nombre del miembro.
 ```bash
-curl -X POST http://127.0.0.1:5000/members/1/renew
+curl -X PUT http://127.0.0.1:5000/members/2 \
+     -H "Content-Type: application/json" \
+     -d '{"name": "Ana Maria Perez"}'
 ```
 
-### 5. Eliminar Miembro
-**DELETE** `/members/<id>`
+### 5. Renovar Membresía (Business Logic)
+Regla: +30 días base. Si antigüedad > 12 meses, +30 días adicionales de bonificación.
 ```bash
-curl -X DELETE http://127.0.0.1:5000/members/1
+curl -X POST http://127.0.0.1:5000/members/2/renew
+```
+
+### 6. Eliminar un Miembro (Delete)
+```bash
+curl -X DELETE http://127.0.0.1:5000/members/2
 ```

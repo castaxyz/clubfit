@@ -21,6 +21,7 @@ class MemberRepositorySQLAlchemy(MemberRepository):
             )
             session.add(model)
         else:
+            model.name = member.name
             model.expiration_date = member.expiration_date
 
         session.commit()

@@ -8,6 +8,16 @@ class Member:
         self.join_date = join_date
         self.expiration_date = expiration_date
 
+    @classmethod
+    def create_new(cls, id, name):
+        now = datetime.now()
+        return cls(
+            id=id,
+            name=name,
+            join_date=now,
+            expiration_date=now + timedelta(days=30)
+        )
+
     def renew_membership(self):
 
         today = datetime.now()
