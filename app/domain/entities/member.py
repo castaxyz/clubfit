@@ -9,13 +9,16 @@ class Member:
         self.expiration_date = expiration_date
 
     @classmethod
-    def create_new(cls, id, name):
+    def create_new(cls, id, name, join_date=None):
         now = datetime.now()
+        # Si no se pasa fecha, se usa 'ahora' (comportamiento normal)
+        # Si se pasa, simulamos un miembro antiguo (migración)
+        actual_join_date = join_date if join_date else now
         return cls(
             id=id,
             name=name,
-            join_date=now,
-            expiration_date=now + timedelta(days=30)
+            join_date=actual_join_date,
+            expiration_date=actual_join_date + timedelta(days=30)
         )
 
     def renew_membership(self):

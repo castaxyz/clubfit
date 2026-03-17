@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from datetime import datetime
 
 member_bp = Blueprint("members", __name__)
 
@@ -13,10 +14,15 @@ def create_routes(use_cases):
     def create_member():
 
         data = request.json
+        
+        # Opcional: Para migración de datos antiguos (Prueba de negocio)
+        join_date_str = data.get("join_date")
+        join_date = datetime.fromisoformat(join_date_str) if join_date_str else None
 
         use_cases.create_member(
             id=data["id"],
-            name=data["name"]
+            name=data["name"],
+            join_date=join_date
         )
 
         return jsonify({"message": "Member created"})
