@@ -3,70 +3,76 @@
 Este proyecto es una implementación académica de un sistema de gestión de miembros para un gimnasio ("ClubFit"), desarrollado bajo los principios de **Arquitectura Hexagonal**.
 
 ## Requisitos del Taller
-- **Funcionalidad Total (CRUD):** Gestión completa de miembros (Crear, Listar, Obtener, Actualizar/Renovar, Eliminar).
+- **Funcionalidad Total (CRUD):** Gestión completa de miembros.
 - **Regla de Negocio:** Beneficio de `MES_BONIFICADO` si el miembro tiene más de 12 meses de antigüedad al renovar.
 - **Arquitectura Hexagonal:** Aplicación de separación estricta entre Dominio, Aplicación e Infraestructura.
 
 ## Estructura de Capas (Mapping)
-La arquitectura hexagonal se mapea de la siguiente manera:
-
-1.  **DOMINIO (Núcleo):**
-    - `app/domain/entities/`: Entidades de negocio (`Member`) y sus reglas.
-    - `app/domain/ports/`: Interfaces (Puertos) que definen el contrato de persistencia.
-2.  **APLICACIÓN (Casos de Uso):**
-    - `app/application/use_cases/`: Casos de uso que orquestan el negocio (Crear, Listar, Actualizar, Eliminar, Renovar).
-3.  **INFRAESTRUCTURA (Adaptadores):**
-    - **Entrada (Input):** Flask (Adaptador para recibir peticiones HTTP).
-    - **Salida (Output):** SQLAlchemy (Adaptador para persistencia en base de datos).
+1.  **DOMINIO:** Entidades (`Member`) y Puertos (Interfaces de Repositorio).
+2.  **APLICACIÓN:** Casos de uso que orquestan el negocio.
+3.  **INFRAESTRUCTURA:** Adaptadores de Entrada (Flask) y Salida (SQLAlchemy).
 
 ## Patrones de Diseño Aplicados
-- **Repository Pattern:** Desacopla la lógica de negocio del acceso a datos.
-- **Dependency Injection:** Inyección de dependencias en los casos de uso para invertir el control.
-- **Adapter Pattern:** Flask y SQLAlchemy conectan el núcleo con tecnologías externas.
+- **Repository Pattern:** Abstracción de la base de datos.
+- **Dependency Injection:** Inversión de control en los casos de uso.
+- **Adapter Pattern:** Conexión con Flask y SQLAlchemy.
+- **Factory Method:** Creación de entidades con lógica de negocio inicial.
 
 ## Instalación y Ejecución
-1. Clonar el repositorio.
-2. Crear entorno virtual: `python -m venv venv`.
-3. Activar entorno: `source venv/bin/activate`.
-4. Instalar dependencias: `pip install -r requirements.txt`.
-5. Ejecutar: `python run.py`.
+1. Crear entorno virtual: `python -m venv venv`.
+2. Activar entorno: `source venv/bin/activate`.
+3. Instalar dependencias: `pip install -r requirements.txt`.
+4. Ejecutar: `python run.py`.
 
-## Documentación de la API (CRUD Completo)
+## Documentación de la API (CRUD Básico)
 
-Comandos `cURL` verificados para probar toda la funcionalidad:
-
-### 1. Crear un Miembro (Create)
+### 0. Crear un miembro
 ```bash
 curl -X POST http://127.0.0.1:5000/members \
      -H "Content-Type: application/json" \
-     -d '{"id": 2, "name": "Ana Perez"}'
+     -d '{"id": 10, "name": "Julian Casablancas"}'
 ```
 
-### 2. Listar todos los Miembros (Read All)
+### 1. Listar todos los Miembros
 ```bash
 curl -X GET http://127.0.0.1:5000/members
 ```
 
-### 3. Obtener un Miembro por ID (Read One)
+### 2. Obtener un Miembro por ID
 ```bash
-curl -X GET http://127.0.0.1:5000/members/2
+curl -X GET http://127.0.0.1:5000/members/10
 ```
 
-### 4. Actualizar un Miembro (Update)
-Actualiza el nombre del miembro.
+### 3. Actualizar Datos de un Miembro (Nombre)
 ```bash
-curl -X PUT http://127.0.0.1:5000/members/2 \
+curl -X PUT http://127.0.0.1:5000/members/10 \
      -H "Content-Type: application/json" \
-     -d '{"name": "Ana Maria Perez"}'
+     -d '{"name": "Julian C. Updated"}'
 ```
 
-### 5. Renovar Membresía (Business Logic)
-Regla: +30 días base. Si antigüedad > 12 meses, +30 días adicionales de bonificación.
+### 4. Eliminar un Miembro
 ```bash
-curl -X POST http://127.0.0.1:5000/members/2/renew
+curl -X DELETE http://127.0.0.1:5000/members/10
 ```
 
-### 6. Eliminar un Miembro (Delete)
+## Escenarios de Prueba (Validación de Regla de Negocio)
+
+Para validar la lógica de antigüedad (>12 meses), usamos el campo `join_date` (migración de datos).
+
+### Paso A: Crear Miembros con diferentes antigüedades
 ```bash
-curl -X DELETE http://127.0.0.1:5000/members/2
+# Miembro Nuevo (Antigüedad: 0 días)
+curl -X POST http://127.0.0.1:5000/members -H "Content-Type: application/json" -d '{"id": 101, "name": "Carlos Nuevo"}'
+
+# Miembro Antiguo (Antigüedad: > 2 años)
+curl -X POST http://127.0.0.1:5000/members -H "Content-Type: application/json" -d '{"id": 999, "name": "Ana Antigua", "join_date": "2024-01-01T10:00:00"}'
+```
+
+### Paso B: Probar Renovación y Validar Bono
+```bash
+# Caso 1: Miembro 101 -> Recibirá +30 días (Normal)
+curl -X POST http://127.0.0.1:5000/members/101/renew
+
+# Caso 2: Miembro 999 -> Recibirá +60 días (Bono Aplicado)
+curl -X POST http://127.0.0.1:5000/members/999/renew
 ```

@@ -24,11 +24,15 @@ class Member:
     def renew_membership(self):
 
         today = datetime.now()
+        
+        # Punto de partida: Si ya venció, empezamos desde hoy. 
+        # Si aún es vigente, sumamos a lo que le queda (para no perder días).
+        start_date = max(today, self.expiration_date)
 
         # renovación base: +1 mes
-        new_expiration = self.expiration_date + timedelta(days=30)
+        new_expiration = start_date + timedelta(days=30)
 
-        # regla de negocio
+        # regla de negocio: bono por antigüedad (> 12 meses desde join_date)
         months_as_member = (today - self.join_date).days / 30
 
         if months_as_member >= 12:
