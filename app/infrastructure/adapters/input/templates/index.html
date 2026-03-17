@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClubFit - Dashboard de Miembros</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #27ae60;
+            --bg: #f4f7f6;
+            --text: #333;
+            --white: #fff;
+            --danger: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--primary);
+            color: var(--white);
+            padding: 20px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        h2 { margin-top: 0; color: var(--primary); }
+
+        .form-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        input {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            flex: 1;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-add { background: var(--accent); color: white; }
+        .btn-add:hover { background: #219150; }
+
+        .btn-renew { background: #3498db; color: white; }
+        .btn-renew:hover { background: #2980b9; }
+
+        .btn-delete { background: var(--danger); color: white; }
+        .btn-delete:hover { background: #c0392b; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th { background: #f8f9fa; font-weight: 600; color: #7f8c8d; }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .badge-active { background: #d4edda; color: #155724; }
+        .badge-expired { background: #f8d7da; color: #721c24; }
+
+        .actions { display: flex; gap: 8px; }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #333;
+            color: white;
+            border-radius: 8px;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>ClubFit 🏋️‍♂️</h1>
+            <div>Gestión de Membresías</div>
+        </header>
+
+        <div class="card">
+            <h2>Registrar Nuevo Miembro</h2>
+            <div class="form-group">
+                <input type="number" id="memberId" placeholder="ID (ej: 101)">
+                <input type="text" id="memberName" placeholder="Nombre completo">
+                <button class="btn-add" onclick="createMember()">+ Registrar Miembro</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Lista de Miembros</h2>
+            <table id="membersTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Expiración</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="membersList">
+                    <!-- Dinámico -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const API_URL = '/members';
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 3000);
+        }
+
+        async function fetchMembers() {
+            const res = await fetch(API_URL);
+            const members = await res.json();
+            const list = document.getElementById('membersList');
+            list.innerHTML = '';
+
+            members.forEach(m => {
+                const isExpired = new Date(m.expiration_date) < new Date();
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${m.id}</td>
+                    <td><strong>${m.name}</strong></td>
+                    <td>${new Date(m.expiration_date).toLocaleDateString()}</td>
+                    <td>
+                        <span class="status-badge ${isExpired ? 'badge-expired' : 'badge-active'}">
+                            ${isExpired ? 'Vencido' : 'Activo'}
+                        </span>
+                    </td>
+                    <td class="actions">
+                        <button class="btn-renew" onclick="renewMember(${m.id})">Renovar</button>
+                        <button class="btn-delete" onclick="deleteMember(${m.id})">Eliminar</button>
+                    </td>
+                `;
+                list.appendChild(tr);
+            });
+        }
+
+        async function createMember() {
+            const id = document.getElementById('memberId').value;
+            const name = document.getElementById('memberName').value;
+
+            if(!id || !name) return alert("Completa todos los campos");
+
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: parseInt(id), name })
+            });
+
+            if(res.ok) {
+                showToast("Miembro registrado con éxito");
+                document.getElementById('memberId').value = '';
+                document.getElementById('memberName').value = '';
+                fetchMembers();
+            }
+        }
+
+        async function renewMember(id) {
+            const res = await fetch(`${API_URL}/${id}/renew`, { method: 'POST' });
+            if(res.ok) {
+                showToast(`Membresía ${id} renovada (+ bonificación si aplica)`);
+                fetchMembers();
+            }
+        }
+
+        async function deleteMember(id) {
+            if(!confirm("¿Estás seguro de eliminar este miembro?")) return;
+            const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+            if(res.ok) {
+                showToast("Miembro eliminado");
+                fetchMembers();
+            }
+        }
+
+        // Carga inicial
+        fetchMembers();
+    </script>
+</body>
+</html>

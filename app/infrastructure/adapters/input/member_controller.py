@@ -1,13 +1,18 @@
-from flask import Blueprint, request, jsonify
+import os
+from flask import Blueprint, request, jsonify, render_template
 
-member_bp = Blueprint("members", __name__)
+member_bp = Blueprint(
+    "members",
+    __name__,
+    template_folder="templates"
+)
 
 
 def create_routes(use_cases):
 
     @member_bp.route("/")
     def home():
-        return {"message": "ClubFit API running"}
+        return render_template("index.html")
 
     @member_bp.route("/members", methods=["POST"])
     def create_member():
