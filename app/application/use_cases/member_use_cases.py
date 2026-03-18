@@ -6,8 +6,8 @@ class MemberUseCases:
     def __init__(self, member_repository):
         self.member_repository = member_repository
 
-    def create_member(self, id, name):
-        member = Member.create_new(id, name)
+    def create_member(self, id, name, join_date=None):
+        member = Member.create_new(id, name, join_date)
         return self.member_repository.save(member)
 
     def list_members(self):
