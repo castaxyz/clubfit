@@ -12,6 +12,10 @@ class MemberRepository(ABC):
         pass
 
     @abstractmethod
+    def get_by_email(self, email):
+        pass
+
+    @abstractmethod
     def list_all(self):
         pass
 
