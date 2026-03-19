@@ -30,7 +30,7 @@ Este proyecto es una implementación académica de un sistema de gestión de mie
 ```bash
 curl -X POST http://127.0.0.1:5000/members \
      -H "Content-Type: application/json" \
-     -d '{"id": 10, "name": "Julian Casablancas"}'
+     -d '{"id": 10, "name": "Julian Casablancas", "email": "julian@casablancas.com", "phone": "12345678"}'
 ```
 
 ### 1. Listar todos los Miembros
@@ -47,7 +47,7 @@ curl -X GET http://127.0.0.1:5000/members/10
 ```bash
 curl -X PUT http://127.0.0.1:5000/members/10 \
      -H "Content-Type: application/json" \
-     -d '{"name": "Julian C. Updated"}'
+     -d '{"name": "Julian C. Updated", "email": "julian_new@casablancas.com"}'
 ```
 
 ### 4. Eliminar un Miembro
@@ -62,10 +62,10 @@ Para validar la lógica de antigüedad (>12 meses), usamos el campo `join_date` 
 ### Paso A: Crear Miembros con diferentes antigüedades
 ```bash
 # Miembro Nuevo (Antigüedad: 0 días)
-curl -X POST http://127.0.0.1:5000/members -H "Content-Type: application/json" -d '{"id": 101, "name": "Carlos Nuevo"}'
+curl -X POST http://127.0.0.1:5000/members -H "Content-Type: application/json" -d '{"id": 101, "name": "Carlos Nuevo", "email": "carlos@mail.com", "phone": "111111"}'
 
 # Miembro Antiguo (Antigüedad: > 2 años)
-curl -X POST http://127.0.0.1:5000/members -H "Content-Type: application/json" -d '{"id": 999, "name": "Ana Antigua", "join_date": "2024-01-01T10:00:00"}'
+curl -X POST http://127.0.0.1:5000/members -H "Content-Type: application/json" -d '{"id": 999, "name": "Ana Antigua", "email": "ana@mail.com", "phone": "222222", "join_date": "2024-01-01T10:00:00"}'
 ```
 
 ### Paso B: Probar Renovación y Validar Bono
