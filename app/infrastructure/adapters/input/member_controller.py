@@ -20,7 +20,6 @@ def create_routes(use_cases):
         if missing:
             return jsonify({"error": f"Campos obligatorios faltantes: {missing}"}), 400
         
-        # Opcional: Para migración de datos antiguos (Prueba de negocio)
         join_date_str = data.get("join_date")
         join_date = datetime.fromisoformat(join_date_str) if join_date_str else None
 

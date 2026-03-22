@@ -23,8 +23,7 @@ class Member:
     @classmethod
     def create_new(cls, id, name, email, phone, join_date=None):
         now = datetime.now()
-        # Si no se pasa fecha, se usa 'ahora' (comportamiento normal)
-        # Si se pasa, simulamos un miembro antiguo (migración)
+
         actual_join_date = join_date if join_date else now
         return cls(
             id=id,
@@ -41,15 +40,11 @@ class Member:
     def renew_membership(self):
 
         today = datetime.now()
-        
-        # Punto de partida: Si ya venció, empezamos desde hoy. 
-        # Si aún es vigente, sumamos a lo que le queda (para no perder días).
+
         start_date = max(today, self.expiration_date)
 
-        # renovación base: +1 mes
         new_expiration = start_date + timedelta(days=30)
 
-        # regla de negocio: bono por antigüedad (> 12 meses desde join_date)
         months_as_member = (today - self.join_date).days / 30.44
         benefit_applied = self.BENEFIT_NONE
         bonus_days = 0

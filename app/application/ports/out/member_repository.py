@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class MemberRepository(ABC):
+class MemberRepositoryPort(ABC):
 
     @abstractmethod
     def save(self, member):
