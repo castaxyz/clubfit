@@ -20,7 +20,6 @@ def create_routes(use_cases):
         if missing:
             return jsonify({"error": f"Campos obligatorios faltantes: {missing}"}), 400
         
-        # Opcional: Para migración de datos antiguos (Prueba de negocio)
         join_date_str = data.get("join_date")
         join_date = datetime.fromisoformat(join_date_str) if join_date_str else None
 
@@ -66,10 +65,11 @@ def create_routes(use_cases):
 
     @member_bp.route("/members/<int:member_id>", methods=["GET"])
     def get_member(member_id):
-        member = use_cases.get_member(member_id)
-        if not member:
-            return jsonify({"error": "Member not found"}), 404
-        
+        try:
+            member = use_cases.get_member(member_id)
+        except ValueError as e:
+            return jsonify({"error": str(e)}), 404
+
         return jsonify({
             "id": member.id,
             "name": member.name,
