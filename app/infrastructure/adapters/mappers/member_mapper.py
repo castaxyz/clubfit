@@ -1,5 +1,5 @@
-from app.domain.entities.member import Member
-from app.infrastructure.persistence.models import MemberModel
+from app.domain.model.member import Member
+from app.infrastructure.adapters.output.persistence.member_entity import MemberModel
 
 
 class MemberMapper:

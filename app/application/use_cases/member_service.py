@@ -1,9 +1,9 @@
 from app.application.ports.input.member_use_case import MemberUseCase
 from app.application.ports.out.member_repository import MemberRepositoryPort
-from app.domain.entities.member import Member
+from app.domain.model.member import Member
 
 
-class MemberUseCases(MemberUseCase):
+class MemberService(MemberUseCase):
 
     def __init__(self, member_repository: MemberRepositoryPort):
         self.member_repository = member_repository

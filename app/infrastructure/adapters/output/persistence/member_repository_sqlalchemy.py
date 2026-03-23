@@ -1,7 +1,7 @@
 from app.application.ports.out.member_repository import MemberRepositoryPort
-from app.infrastructure.adapters.output.member_mapper import MemberMapper
-from app.infrastructure.persistence.database import SessionLocal
-from app.infrastructure.persistence.models import MemberModel
+from app.infrastructure.adapters.mappers.member_mapper import MemberMapper
+from app.infrastructure.adapters.output.persistence.database import SessionLocal
+from app.infrastructure.adapters.output.persistence.member_entity import MemberModel
 
 
 class MemberRepositorySQLAlchemy(MemberRepositoryPort):

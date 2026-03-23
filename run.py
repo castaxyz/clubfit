@@ -1,12 +1,12 @@
 from flask import Flask
 
-from app.application.use_cases.member_use_cases import MemberUseCases
-from app.infrastructure.adapters.output.member_repository_sqlalchemy import (
+from app.application.use_cases.member_service import MemberService
+from app.infrastructure.adapters.output.persistence.member_repository_sqlalchemy import (
     MemberRepositorySQLAlchemy,
 )
 from app.infrastructure.adapters.input.member_controller import create_routes
-from app.infrastructure.persistence.models import Base
-from app.infrastructure.persistence.database import engine
+from app.infrastructure.adapters.output.persistence.member_entity import Base
+from app.infrastructure.adapters.output.persistence.database import engine
 
 
 def create_app():
@@ -17,7 +17,7 @@ def create_app():
 
     repository = MemberRepositorySQLAlchemy()
 
-    use_cases = MemberUseCases(repository)
+    use_cases = MemberService(repository)
 
     member_routes = create_routes(use_cases)
 
