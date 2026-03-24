@@ -8,8 +8,9 @@ Este proyecto es una implementación de un sistema de gestión de miembros para 
 - **Arquitectura Hexagonal:** Aplicación de separación estricta entre Dominio, Aplicación e Infraestructura.
 
 ## Estructura de Capas (Mapping)
-1.  **DOMINIO:** Entidades (`Member`) y Puertos (Interfaces de Repositorio).
-2.  **APLICACIÓN:** Casos de uso que orquestan el negocio.
+La arquitectura sigue el principio de inversión de dependencias: la infraestructura depende de la aplicación mediante la implementación de los puertos, pero la aplicación no depende de detalles técnicos.
+1.  **DOMINIO:** Entidades (Member) y lógica de negocio.
+2.  **APLICACIÓN:** Casos de uso que orquestan el negocio y definen los puertos (interfaces de entrada y salida).
 3.  **INFRAESTRUCTURA:** Adaptadores de Entrada (Flask + HTML) y Salida (SQLAlchemy).
 
 ## Instalación y Ejecución
