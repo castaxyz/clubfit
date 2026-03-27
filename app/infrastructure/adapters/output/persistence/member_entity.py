@@ -4,7 +4,7 @@ from sqlalchemy import Column, Integer, String, DateTime
 Base = declarative_base()
 
 
-class MemberModel(Base):
+class MemberEntity(Base):
 
     __tablename__ = "members"
 
