@@ -1,0 +1,65 @@
+version: "3.8"
+
+services:
+
+  db:
+    image: postgres:15-alpine
+    container_name: clubfit-db
+    environment:
+      POSTGRES_DB: clubfit
+      POSTGRES_USER: clubfit
+      POSTGRES_PASSWORD: clubfit123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U clubfit"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: clubfit-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  web:
+    build: .
+    container_name: clubfit-web
+    command: python run.py
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: postgresql://clubfit:clubfit123@db:5432/clubfit
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build: .
+    container_name: clubfit-worker
+    command: python worker.py
+    environment:
+      DATABASE_URL: postgresql://clubfit:clubfit123@db:5432/clubfit
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      EXPIRY_CHECK_INTERVAL_MINUTES: 5
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
