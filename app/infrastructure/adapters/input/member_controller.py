@@ -9,6 +9,11 @@ def create_routes(use_cases):
     @member_bp.route("/")
     def home():
         return {"message": "ClubFit API running"}
+    
+    @member_bp.route("/admin/trigger-expiry-check", methods=["POST"])
+    def trigger_expiry():
+        result = use_cases.trigger_expiry_check()
+        return jsonify(result), 202
 
     @member_bp.route("/members", methods=["POST"])
     def create_member():
