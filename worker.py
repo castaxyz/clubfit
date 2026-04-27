@@ -13,9 +13,14 @@ from app.infrastructure.adapters.output.messaging.redis_publisher import RedisPu
 from app.application.use_cases.expiry_service import ExpiryService
 from app.infrastructure.adapters.input.redis_subscriber import RedisSubscriber
 from app.infrastructure.scheduler.expiry_scheduler import ExpiryScheduler
+from app.infrastructure.adapters.output.persistence.member_entity import Base as MemberBase
+from app.infrastructure.adapters.output.persistence.training_entity import Base as TrainingBase
+from app.infrastructure.adapters.output.persistence.database import engine
 
 
 def main():
+    MemberBase.metadata.create_all(engine)
+    TrainingBase.metadata.create_all(engine)
 
     repository = ExpiryRepositorySQLAlchemy()
     publisher  = RedisPublisher()
